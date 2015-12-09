@@ -22,30 +22,19 @@ namespace WindowRearranger
 
         private List<RealWorldScreen> realWorldScreens;
 
-        Process[] ActiveWindowList;
+        private int index;
 
-
-        [DllImport("user32.dll")]
-        private extern static bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, int uFlags);
-
-        public static IntPtr HWND_TOPMOST = (IntPtr)(-1);
-        public static IntPtr HWND_TOP = (IntPtr)(0);
-        
-
-
-
-        public const int SWP_SHOWWINDOW = 0x0040;
-
+        private IntPtr[] ActiveWindowListHandles;
 
         public Form1()
         {
             InitializeComponent();
-
-            acquireScreenDetails();
-
+            acquireScreenDetails(); // how many screens do we have available
         }
 
-
+        /*
+         * This information acquired by this function is not actually made use as yet. 
+         */
         private void acquireScreenDetails()
         {
             totalNumberOfScreens = 0;
@@ -84,30 +73,7 @@ namespace WindowRearranger
 
                 index++;
             }
-
-            //       cbmListOfScreens.Items.Add("AHHHHHHHH");
-        } // END OF acquireScreenDetails()
-
-
-        private void getProcesses()
-        {
-            Process[] processlist = Process.GetProcesses();
-
-            ActiveWindowList = new Process[100];
-
-            int idx = 0;
-            foreach (Process process in processlist)
-            {
-                // store only the processes that are actually windows
-                if (!String.IsNullOrEmpty(process.MainWindowTitle))
-                {
-                    ActiveWindowList[idx] = process; // store the window's process
-                    cmbActiveWindows.Items.Add(process.MainWindowTitle);
-                    idx++;
-                }
-            }
-
-        }
+        } 
 
         [StructLayout(LayoutKind.Sequential)]
         public struct RECT
@@ -117,8 +83,23 @@ namespace WindowRearranger
             public int Right;
             public int Bottom;
         }
+
+        /*
+         * ===========================================
+         * Move the selected window to the main screen
+         * ===========================================
+         */
+
         [DllImport("user32.dll")]
-        public static extern bool GetWindowRect(IntPtr hWnd, out RECT lpRect); 
+        private static extern bool GetWindowRect(IntPtr hWnd, out RECT lpRect);
+
+        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        private extern static bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, int uFlags);
+
+        private static IntPtr HWND_TOPMOST = (IntPtr)(-1); // this is not used here
+        private static IntPtr HWND_TOP = (IntPtr)(0);      // this is used
+
+        private const int SWP_SHOWWINDOW = 0x0040;
 
         private void btnMoveWindow_Click(object sender, EventArgs e)
         {
@@ -127,27 +108,15 @@ namespace WindowRearranger
             int iCurrentlySelectedScreen = cmbAvailableScreens.SelectedIndex;
 
             // move the window to the screen
+            RECT pRect;
+            Size cSize = new Size();
+            // get coordinates relative to window
+            GetWindowRect(ActiveWindowListHandles[iCurrentlySelectedWindow], out pRect);
 
-   //         if (ActiveWindowList[iCurrentlySelectedWindow] != null)
-   //         {
-                Process gameClientProc = ActiveWindowList[iCurrentlySelectedWindow];
-                int bobo = gameClientProc.Id;
-     //       }
-     //       else
-     //           MessageBox.Show("shit");
-
-                RECT pRect;
-                Size cSize = new Size();
-                // get coordinates relative to window
-                GetWindowRect(gameClientProc.MainWindowHandle, out pRect);
-
-                cSize.Width = pRect.Right - pRect.Left;
-                cSize.Height = pRect.Bottom - pRect.Top;
-
-        //        SetWindowPos(gameClientProc.MainWindowHandle, HWND_TOP, realWorldScreens[iCurrentlySelectedScreen].screenTopLeftXCoord, realWorldScreens[iCurrentlySelectedScreen].screenTopLeftYCoord, cSize.Width, cSize.Height, SWP_SHOWWINDOW);
-            
-                SetWindowPos(gameClientProc.MainWindowHandle, HWND_TOP, 0, 0, cSize.Width, cSize.Height, SWP_SHOWWINDOW);
-            
+            cSize.Width = pRect.Right - pRect.Left;
+            cSize.Height = pRect.Bottom - pRect.Top;
+            // move the window
+            SetWindowPos(ActiveWindowListHandles[iCurrentlySelectedWindow], HWND_TOP, 0, 0, cSize.Width, cSize.Height, SWP_SHOWWINDOW);            
 
         }
 
@@ -158,8 +127,49 @@ namespace WindowRearranger
 
         private void cmbActiveWindows_Click(object sender, EventArgs e)
         {
+            index = 0;
             cmbActiveWindows.Items.Clear();
-            getProcesses();
+            getActiveWindows();
+        }
+
+
+        /*
+         * ==============================================================
+         * EnumWindows used to acquire the Handle of all existing windows
+         * see:
+         * https://code.msdn.microsoft.com/windowsapps/Enumerate-top-level-9aa9d7c1/sourcecode?fileId=44683&pathId=1184961558
+         * https://code.msdn.microsoft.com/windowsapps/Enumerate-top-level-9aa9d7c1
+         * ==============================================================
+         */
+
+        protected delegate bool EnumWindowsProc(IntPtr hWnd, IntPtr lParam);
+        [DllImport("user32.dll", CharSet = CharSet.Unicode)]
+        protected static extern int GetWindowText(IntPtr hWnd, StringBuilder strText, int maxCount);
+        [DllImport("user32.dll", CharSet = CharSet.Unicode)]
+        protected static extern int GetWindowTextLength(IntPtr hWnd);
+        [DllImport("user32.dll")]
+        protected static extern bool EnumWindows(EnumWindowsProc enumProc, IntPtr lParam);
+        [DllImport("user32.dll")]
+        protected static extern bool IsWindowVisible(IntPtr hWnd);
+
+        private bool EnumTheWindows(IntPtr hWnd, IntPtr lParam)
+        {
+            int size = GetWindowTextLength(hWnd);
+            if (size++ > 0 && IsWindowVisible(hWnd))
+            {
+                // add window to combobox
+                StringBuilder sb = new StringBuilder(size); 
+                GetWindowText(hWnd, sb, size);
+                cmbActiveWindows.Items.Add(sb);
+                ActiveWindowListHandles[index] = hWnd;
+                index++;
+            }
+            return true;
+        } 
+        private void getActiveWindows()
+        {
+            ActiveWindowListHandles = new IntPtr[100];
+            EnumWindows(new EnumWindowsProc(EnumTheWindows), IntPtr.Zero); 
         }
 
     }
