@@ -1,0 +1,9 @@
+D:\Current Projects\WindowMover\WindowRearranger\WindowRearranger\bin\Release\WindowRearranger.exe.config
+D:\Current Projects\WindowMover\WindowRearranger\WindowRearranger\bin\Release\WindowRearranger.exe
+D:\Current Projects\WindowMover\WindowRearranger\WindowRearranger\bin\Release\WindowRearranger.pdb
+D:\Current Projects\WindowMover\WindowRearranger\WindowRearranger\obj\Release\WindowRearranger.csprojResolveAssemblyReference.cache
+D:\Current Projects\WindowMover\WindowRearranger\WindowRearranger\obj\Release\WindowRearranger.Form1.resources
+D:\Current Projects\WindowMover\WindowRearranger\WindowRearranger\obj\Release\WindowRearranger.Properties.Resources.resources
+D:\Current Projects\WindowMover\WindowRearranger\WindowRearranger\obj\Release\WindowRearranger.csproj.GenerateResource.Cache
+D:\Current Projects\WindowMover\WindowRearranger\WindowRearranger\obj\Release\WindowRearranger.exe
+D:\Current Projects\WindowMover\WindowRearranger\WindowRearranger\obj\Release\WindowRearranger.pdb
