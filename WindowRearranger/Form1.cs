@@ -30,6 +30,8 @@ namespace WindowRearranger
         {
             InitializeComponent();
             acquireScreenDetails(); // how many screens do we have available
+            index = 0;
+            getActiveWindows();
         }
 
         /*
@@ -101,7 +103,7 @@ namespace WindowRearranger
 
         private const int SWP_SHOWWINDOW = 0x0040;
 
-        private void btnMoveWindow_Click(object sender, EventArgs e)
+        private void moveWindow()
         {
             // move the windows based on the idx of the window and the idx of the screen
             int iCurrentlySelectedWindow = cmbActiveWindows.SelectedIndex;
@@ -116,8 +118,12 @@ namespace WindowRearranger
             cSize.Width = pRect.Right - pRect.Left;
             cSize.Height = pRect.Bottom - pRect.Top;
             // move the window
-            SetWindowPos(ActiveWindowListHandles[iCurrentlySelectedWindow], HWND_TOP, 0, 0, cSize.Width, cSize.Height, SWP_SHOWWINDOW);            
+            SetWindowPos(ActiveWindowListHandles[iCurrentlySelectedWindow], HWND_TOP, 0, 0, cSize.Width, cSize.Height, SWP_SHOWWINDOW);  
+        }
 
+        private void btnMoveWindow_Click(object sender, EventArgs e)
+        {
+            moveWindow();
         }
 
         private void cmbAvailableScreens_SelectedIndexChanged(object sender, EventArgs e)
@@ -170,6 +176,24 @@ namespace WindowRearranger
         {
             ActiveWindowListHandles = new IntPtr[100];
             EnumWindows(new EnumWindowsProc(EnumTheWindows), IntPtr.Zero); 
+        }
+
+        private void btnMoveAllWindows_Click(object sender, EventArgs e)
+        {
+            int index = 0;
+            // iterate through the combobox
+            foreach (var item in cmbActiveWindows.Items)
+            {
+                // do something with your item
+
+                // change index
+                cmbActiveWindows.SelectedIndex = index;
+                // move window
+                moveWindow();
+
+                index++;
+
+            }
         }
 
     }

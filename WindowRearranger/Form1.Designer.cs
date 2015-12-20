@@ -36,6 +36,7 @@
             this.label3 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
             this.sig = new System.Windows.Forms.Label();
+            this.btnMoveAllWindows = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // label1
@@ -111,17 +112,28 @@
             // 
             this.sig.AutoSize = true;
             this.sig.Font = new System.Drawing.Font("Comic Sans MS", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.sig.Location = new System.Drawing.Point(2, 230);
+            this.sig.Location = new System.Drawing.Point(-1, 266);
             this.sig.Name = "sig";
             this.sig.Size = new System.Drawing.Size(54, 19);
             this.sig.TabIndex = 7;
             this.sig.Text = "ChuckE";
             // 
+            // btnMoveAllWindows
+            // 
+            this.btnMoveAllWindows.Location = new System.Drawing.Point(204, 216);
+            this.btnMoveAllWindows.Name = "btnMoveAllWindows";
+            this.btnMoveAllWindows.Size = new System.Drawing.Size(100, 47);
+            this.btnMoveAllWindows.TabIndex = 8;
+            this.btnMoveAllWindows.Text = "Move All Windows";
+            this.btnMoveAllWindows.UseVisualStyleBackColor = true;
+            this.btnMoveAllWindows.Click += new System.EventHandler(this.btnMoveAllWindows_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(522, 248);
+            this.ClientSize = new System.Drawing.Size(522, 283);
+            this.Controls.Add(this.btnMoveAllWindows);
             this.Controls.Add(this.sig);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.label3);
@@ -146,6 +158,7 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label sig;
+        private System.Windows.Forms.Button btnMoveAllWindows;
     }
 }
 
